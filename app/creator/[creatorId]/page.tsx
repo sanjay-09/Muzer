@@ -8,6 +8,7 @@ const page=({params}:{
         creatorId:string
     }
 })=>{
+    console.log('creatorId',params.creatorId);
    const session=useSession();
    const router=useRouter();
    if(!session.data?.user.id){
