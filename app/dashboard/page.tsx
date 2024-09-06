@@ -8,11 +8,13 @@ const REFRESH_INTERVAL_MS=10*1000;
 
 export default function Component() {
   const session=useSession();
+  console.log("dash",session);
   const router=useRouter();
+  const id=sessionStorage.getItem('creatorId');
   if(!session?.data?.user.id){
      return router.push("/");
         
   }
-  return <StreamView creatorId={session?.data.user.id}/>
+  return <StreamView creatorId={id?id:session?.data.user.id}/>
   
 }

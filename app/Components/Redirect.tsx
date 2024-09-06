@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const Redirect=()=>{
+    console.log('redirect');
     const session=useSession();
     const router=useRouter();
     console.log('session',session);
@@ -14,12 +15,12 @@ const Redirect=()=>{
         }
         
     },[session]);
-
     return(
-        <div>
-
-        </div>
+        <>
+        </>
     )
+
+    
 
 }
 export default Redirect;

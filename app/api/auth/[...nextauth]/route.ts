@@ -11,34 +11,41 @@ declare module "next-auth" {
 }
 
 const handler = NextAuth({
-    providers: [
-        GoogleProvider({
-          clientId: process.env.GOOGLE_CLIENT_ID ?? "",
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? ""
-        })
-      ],
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+     
+    })
+  ],
       secret: process.env.NEXTAUTH_SECRET,
       callbacks:{
-        async signIn(params){
-          if(!params.user.email){
-            return false;
+        async signIn(params) {
+          if (!params.user.email) {
+              return false;
           }
-          
-          try{
-            await primsaClient.user.create({
-              data:{
-                email:params.user.email,
-                provider:'Google'
+
+          try {
+              const existingUser = await primsaClient.user.findUnique({
+                  where: {
+                      email: params.user.email
+                  }
+              })
+              if (existingUser) {
+                  return true
               }
-            })
-
-          }
-          catch(err){
-            return false;
-
-          }
-          return true;
-        },
+              await primsaClient.user.create({
+                  data: {
+                      email: params.user.email,
+                      provider: "Google"
+                  } 
+              })
+              return true;
+           } catch(e) {
+              console.log(e);
+              return false;
+           }
+      },
         async session({ session}) {
           const dbUser = await primsaClient.user.findUnique({
             where: {
@@ -48,6 +55,7 @@ const handler = NextAuth({
         if (!dbUser) {
             return session;
         }
+        console.log("handler",session);
         return {
             ...session, 
             user: {

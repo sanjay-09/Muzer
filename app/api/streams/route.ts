@@ -32,7 +32,7 @@ export const POST=async(req:NextRequest)=>{
             return a.width-b.width
         })
         console.log(thumbnails);
-        await primsaClient.stream.create({
+       const streamData= await primsaClient.stream.create({
             data:{
                 userId:data.creatorId,
                 url:data.url,
@@ -41,12 +41,12 @@ export const POST=async(req:NextRequest)=>{
                 title:title ?? 'cant find video',
                 smallImg:thumbnails.length>1?thumbnails[thumbnails.length-2].url:thumbnails[thumbnails.length-1].url,
                 bigImg:thumbnails[thumbnails.length-1].url
-    
 
             }
         })
         return NextResponse.json({
-            message:'created the stream'
+            message:'created the stream',
+            data:streamData
         },{
             status:200
         })
@@ -67,13 +67,13 @@ export const GET=async(req:NextRequest)=>{
     const { searchParams } = new URL(req.url);
     const creatorid=searchParams.get('creatorId');
     const session = await getServerSession();
-    console.log("session",session);
+   
     const user=await primsaClient.user.findFirst({
         where:{
             email:session?.user?.email ?? ""
         }
     })
-    console.log("user",user);
+   
     if(!user){
         return NextResponse.json({
             message:'Unauthenticated'
@@ -91,10 +91,11 @@ export const GET=async(req:NextRequest)=>{
         })
         
     }
-    console.log('creator',creatorid);
-    const userStreams=await primsaClient.stream.findMany({
+    
+    const [userStreams,activeStream]=[await primsaClient.stream.findMany({
         where:{
-            userId:creatorid
+            userId:creatorid,
+            played:false
         },
         include: {
             _count:{
@@ -108,8 +109,16 @@ export const GET=async(req:NextRequest)=>{
                 }
             }
           },
-    })   
-   console.log("u",userStreams);
+    }),await primsaClient.currentStream.findFirst({
+        where:{
+            userId:creatorid
+        },
+        include:{
+            stream:true
+        }
+    })] 
+    console.log("active",activeStream);  
+  
     const data=userStreams.map(({_count,upvotes,...rest})=>{
         return {
             ...rest,
@@ -119,11 +128,11 @@ export const GET=async(req:NextRequest)=>{
 
     })
     
-    console.log("data",data);
-
+    
     return NextResponse.json({
         message:'OKAY',
-        data:data
+        data:data,
+        activeStream
     },{
         status:200
     })

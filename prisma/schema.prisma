@@ -16,7 +16,7 @@ model User {
   id        String      @id @default(uuid())
   email     String      @unique
   provider  Provider
-  streams   Stream[]  @relation("user")
+  streams   Stream[]  
   upvotes   Upvote[]
 }
 
@@ -33,8 +33,14 @@ model Stream {
   createAt      DateTime      @default(now())
   upvotes       Upvote[]
   userId        String
-  user          User        @relation(fields: [userId], references: [id], name: "user")
+  user          User        @relation(fields: [userId], references: [id])
+  currentStream  CurrentStream?
  
+}
+model CurrentStream{
+  userId String @id
+  StreamId String? @unique
+  stream Stream? @relation(fields: [StreamId],references: [id])
 }
 
 model Upvote {

@@ -12,6 +12,7 @@ const page=({params}:{
    const session=useSession();
    const router=useRouter();
    if(!session.data?.user.id){
+    sessionStorage.setItem('creatorId', params.creatorId);
     return router.push('/')
    }
    return <StreamView creatorId={params.creatorId}/>

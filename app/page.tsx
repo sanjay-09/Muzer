@@ -68,15 +68,7 @@ export default function Component() {
                   <Button className="bg-pink-600 text-white hover:bg-pink-700">Sign Up Now</Button>
                 </div>
               </div>
-              <div className="lg:w-1/2">
-                <img
-                  alt="Community of music listeners"
-                  className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center"
-                  height="310"
-                  src="/placeholder.svg?height=310&width=550"
-                  width="550"
-                />
-              </div>
+              
             </div>
           </div>
         </section>
